@@ -1,21 +1,34 @@
 "use client"
 import useCartStore from '@/stores/cartStore';
+import useFavoriteStore from '@/stores/favoriteStore';
 import { ProductType } from '@/types';
-import { ShoppingCart } from 'lucide-react';
+import { Heart, ShoppingCart } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { toast } from 'react-toastify';
 
 const ProductCard = ({product}:{product:ProductType}) => {
 
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [productTypes, setProductTypes] = useState({
     size: product.sizes[0],
     color: product.colors[0]
   });
+  const [isFavorite, setIsFavorite] = useState(false);
 
   const { addToCart } = useCartStore();
+  const { favorites, addToFavorite, removeFromFavorite, hasHydrated } = useFavoriteStore();
+
+  // Check if the product is already a favorite on component mount
+  useEffect(() => {
+    const isProductInFavorites = favorites.some(
+      (fav) =>
+        fav.id === product.id &&
+        fav.selectedSize === productTypes.size &&
+        fav.selectedColor === productTypes.color
+    );
+    setIsFavorite(isProductInFavorites);
+  }, [favorites, product.id, productTypes.size, productTypes.color]);
 
   const handleProductType = ({ 
     type, 
@@ -40,6 +53,25 @@ const ProductCard = ({product}:{product:ProductType}) => {
     toast.success('Product added to cart')
   }
 
+  const handleToggleFavorite = () => {
+    const productData = ({
+      ...product,
+      quantity: 1,
+      selectedSize: productTypes.size,
+      selectedColor: productTypes.color
+    });
+
+    if (isFavorite) {
+      removeFromFavorite(productData);
+    } else {
+      addToFavorite(productData);
+    }
+
+    // Toggle the heart icon state
+    setIsFavorite((prev) => !prev);
+  }
+
+
   return (
     <div className='shadow-lg rounded-lg overflow-hidden'>
       {/* IMAGE */}
@@ -49,6 +81,7 @@ const ProductCard = ({product}:{product:ProductType}) => {
             src={product.images[productTypes.color]}
             alt={product.name} 
             fill 
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             className='object-cover hover:scale-105 transition-all duration-300'
           />
         </div>
@@ -91,6 +124,17 @@ const ProductCard = ({product}:{product:ProductType}) => {
               ))}
             </div>
           </div>
+          {/* FAVORITE */}
+          {hasHydrated && 
+            <div className='flex items-center justify-between ml-auto mt-2'>
+              <Heart 
+                className="cursor-pointer"                 
+                color={isFavorite ? 'red' : 'gray'} 
+                fill={isFavorite ? 'red' : 'none'} 
+                onClick={handleToggleFavorite}
+              />
+            </div>
+          }
         </div>
         {/* PRICE AND ADD TO CART BUTTON */}
         <div className='flex items-center justify-between'>

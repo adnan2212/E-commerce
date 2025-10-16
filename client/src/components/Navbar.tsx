@@ -1,8 +1,11 @@
+"use client"
+
 import Image from "next/image";
 import Link from "next/link";
 import SearchBar from "./SearchBar";
-import { Bell, Home, ShoppingCart } from "lucide-react";
+import { Bell, Home } from "lucide-react";
 import ShoppingCartIcon from './ShoppingCartIcon';
+import FavoriteIcon from "./FavoriteIcon";
 
 const Navbar = () => {
   return (
@@ -26,6 +29,7 @@ const Navbar = () => {
           <Home className="w-4 h-4 text-gray-600"/>
         </Link>
         <Bell className="w-4 h-4 text-gray-600" />
+        <FavoriteIcon />
         <ShoppingCartIcon />
         <Link href="/login">Sign in</Link>
       </div>

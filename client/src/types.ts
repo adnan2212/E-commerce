@@ -59,3 +59,24 @@ export type CartStoreActionsType = {
   removeFromCart: (product: CartItemType) => void;
   clearCart: () => void;
 }
+
+export type FavoriteItemType = ProductType & {
+  favId?: number | string,
+  quantity: number,
+  selectedSize: string,
+  selectedColor: string
+};
+
+export type FavoriteItemsType = FavoriteItemType[]
+
+export type FavoriteStoreStateType = {
+  favorites: FavoriteItemsType;
+  hasHydrated: boolean;
+}
+
+export type FavoriteActionsType = {
+  addToFavorite: (product: FavoriteItemType) => void;
+  removeFromFavorite: (product: FavoriteItemType) => void;
+  updateFavoriteItem: (favId: string | number, type: "selectedSize" | "selectedColor", selectedSize: string) => void;
+  clearFavorite: () => void;
+}
